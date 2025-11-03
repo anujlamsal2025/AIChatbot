@@ -1,0 +1,74 @@
+{
+  "intents": [
+    {
+      "tag": "greeting",
+      "patterns": ["Hi", "How are you", "Is anyone there?", "Hello", "Good day", "Whats up", "Hey", "greetings"],
+      "responses": ["Hello!", "Good to see you again!", "Hi there, how can I help?"]
+    },
+    {
+      "tag": "goodbye",
+      "patterns": ["cya", "See you later", "Goodbye", "I am Leaving", "Have a Good day", "bye", "cao", "see ya"],
+      "responses": ["Sad to see you go :(", "Talk to you later", "Goodbye!"]
+    },
+    {
+      "tag": "programming",
+      "patterns": ["What is programming?", "What is coding?", "Tell me about programming", "Tell me about coding", "What is software development?"],
+      "responses": ["Programming, coding or software development means writing computer code to automate tasks."]
+    },
+    {
+      "tag": "resource",
+      "patterns": ["Where can I learn to code?", "Best way to learn to code", "How can I learn programming?", "Good programming resources", "Can you recommend good coding resources?"],
+      "responses": ["Check out the NeuralNine YouTube channel and The Python Bible series (7 in 1)."]
+    },
+    {
+      "tag": "stocks",
+      "patterns": ["What are my stocks?", "Which stocks do I own?", "Show my stock portfolio"],
+      "responses": ["Here are your stocks!"]
+    },
+    {
+      "tag": "AI_chatbot",
+      "patterns": ["What is an AI chatbot?", "How does an AI chatbot work?", "Tell me about AI chatbots", "What are AI chatbots used for?", "What is a chatbot?"],
+      "responses": ["An AI chatbot is a software program that uses artificial intelligence to simulate human conversation, allowing users to interact with systems through text or voice."]
+    },
+    {
+      "tag": "AI_advancements",
+      "patterns": ["What are the latest advancements in AI?", "Tell me about the latest trends in AI", "How is AI evolving?", "What is the future of AI?"],
+      "responses": ["AI is rapidly evolving with developments in Natural Language Processing (NLP), machine learning, reinforcement learning, and autonomous systems. Key innovations include AI-powered assistants, self-driving cars, and personalized healthcare."]
+    },
+    {
+      "tag": "machine_learning",
+      "patterns": ["What is machine learning?", "How does machine learning work?", "Tell me about machine learning", "What is the difference between AI and machine learning?"],
+      "responses": ["Machine learning is a subset of AI that allows computers to learn from data and improve over time without being explicitly programmed. It's used for tasks like prediction, classification, and pattern recognition."]
+    },
+    {
+      "tag": "VIT_info",
+      "patterns": ["Tell me about VIT Vellore", "What is VIT Vellore?", "Where is VIT Vellore?", "Give me some details about VIT Vellore"],
+      "responses": ["VIT Vellore (VIT University) is a prestigious private university in Vellore, Tamil Nadu, India. It is known for its world-class infrastructure, research, and emphasis on innovation and technology."]
+    },
+    {
+      "tag": "VIT_courses",
+      "patterns": ["What courses are offered at VIT?", "Tell me about courses at VIT Vellore", "What can I study at VIT?", "Does VIT offer computer science programs?"],
+      "responses": ["VIT offers a wide range of undergraduate, postgraduate, and doctoral programs in fields like Engineering, Computer Science, Business, Arts, and more. The B.Tech program is highly sought after, especially in Computer Science and Electronics."]
+    },
+    {
+      "tag": "VIT_admissions",
+      "patterns": ["How can I apply to VIT?", "What is the admission process for VIT?", "Tell me about VIT VITEEE", "How to get into VIT Vellore?"],
+      "responses": ["To apply to VIT, you must take the VIT Engineering Entrance Exam (VITEEE). The exam is used to assess your knowledge in Physics, Chemistry, and Mathematics for B.Tech admissions."]
+    },
+    {
+      "tag": "VIT_campus",
+      "patterns": ["What is the campus like at VIT?", "Tell me about VIT Vellore campus", "How is the campus at VIT?", "Is VIT campus good for students?"],
+      "responses": ["VIT Vellore has a sprawling, modern campus with world-class infrastructure. It offers various facilities such as hostels, sports complexes, research labs, and cultural clubs. The campus is student-friendly with plenty of green spaces."]
+    },
+    {
+      "tag": "VIT_festivals",
+      "patterns": ["What festivals are celebrated at VIT?", "Tell me about VIT cultural festivals", "When is VIT's annual fest?", "What events happen at VIT Vellore?"],
+      "responses": ["VIT Vellore is famous for its annual tech fest, 'Gravitas', and cultural fest, 'Riviera'. These festivals bring together students from across India for a mix of technology, sports, and entertainment."]
+    },
+    {
+      "tag": "VIT_scholarships",
+      "patterns": ["Are there scholarships available at VIT?", "How can I apply for scholarships at VIT?", "Does VIT offer financial aid?", "What are the scholarship options at VIT?"],
+      "responses": ["Yes, VIT offers several scholarships based on merit and financial need. The VITEEE rank also plays a key role in determining eligibility for scholarships."]
+    }
+  ]
+}
