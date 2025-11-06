@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Purple Glassmorphism Theme */
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #2d1b69 0%, #1a1033 50%, #6d28d9 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            color: #f3e8ff;
+        }
+
+        .glass-container {
+            background: rgba(109, 40, 217, 0.08);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(192, 132, 252, 0.25);
+            box-shadow: 0 12px 40px 0 rgba(109, 40, 217, 0.3);
+        }
+
+        .chat-box::-webkit-scrollbar {
+            width: 8px;
+        }
+        .chat-box::-webkit-scrollbar-track {
+            background: rgba(192, 132, 252, 0.1);
+            border-radius: 10px;
+        }
+        .chat-box::-webkit-scrollbar-thumb {
+            background: rgba(192, 132, 252, 0.4);
+            border-radius: 10px;
+        }
+        .chat-box::-webkit-scrollbar-thumb:hover {
+            background: rgba(192, 132, 252, 0.6);
+        }
+
+        .user-message {
+            align-self: flex-end;
+            background: rgba(167, 139, 250, 0.15);
+            color: #ffffff;
+            border: 1px solid rgba(167, 139, 250, 0.3);
+        }
+        .bot-message {
+            align-self: flex-start;
+            background: rgba(109, 40, 217, 0.1);
+            color: #f3e8ff;
+            border: 1px solid rgba(109, 40, 217, 0.2);
+        }
+
+        .chat-container {
+            width: 95%;
+            max-width: 768px;
+            height: 95vh;
+            max-height: 800px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .send-button {
+            transition: all 0.2s ease-in-out;
+            background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+        }
+        .send-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(124, 58, 237, 0.5);
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+        }
+
+        #user-input:focus {
+            border-color: #c4b5fd;
+            box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.3);
+        }
+
+        /* Typing Dots Animation */
+        .dot-flashing {
+            display: inline-block;
+            position: relative;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #c4b5fd;
+            color: #c4b5fd;
+            animation: dotFlashing 1s infinite linear alternate;
+            animation-delay: 0.3s;
+        }
+
+        .dot-flashing::before,
+        .dot-flashing::after {
+            content: "";
+            display: inline-block;
+            position: absolute;
+            top: 0;
+        }
+
+        .dot-flashing::before {
+            left: -12px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #c4b5fd;
+            color: #c4b5fd;
+            animation: dotFlashing 1s infinite linear alternate;
+            animation-delay: 0s;
+        }
+
+        .dot-flashing::after {
+            left: 12px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #c4b5fd;
+            color: #c4b5fd;
+            animation: dotFlashing 1s infinite linear alternate;
+            animation-delay: 0.6s;
+        }
+
+        @keyframes dotFlashing {
+            0% {
+                background-color: #c4b5fd;
+            }
+            50%,
+            100% {
+                background-color: rgba(196, 181, 253, 0.3);
+            }
+        }
+
+        /* Message animations */
+        .user-message, .bot-message {
+            animation: messageAppear 0.3s ease-out;
+        }
+
+        @keyframes messageAppear {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Header glow effect */
+        .header-glow {
+            text-shadow: 0 0 20px rgba(192, 132, 252, 0.5);
+        }
+
+        /* Subtle background pattern */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(124, 58, 237, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 85% 30%, rgba(192, 132, 252, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 50% 80%, rgba(109, 40, 217, 0.1) 0%, transparent 20%);
+            z-index: -1;
+        }
+    </style>
+</head>
+
+<body class="antialiased">
+
+<div class="chat-container glass-container rounded-3xl shadow-2xl p-4 md:p-6">
+    <div class="chat-header pb-4 mb-4 border-b border-purple-300/20">
+        <h2 class="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-200 to-purple-400 header-glow">
+            ✨ AI ChatBot
+        </h2>
+        <p class="text-sm text-purple-200/80 mt-1">
+            Your conversational AI assistant. Ask anything, get smart answers.
+        </p>
+    </div>
+
+    <div id="chat-box" class="chat-box flex-grow overflow-y-auto space-y-4 pr-2 mb-4">
+        <div class='bot-message p-3 rounded-xl max-w-[85%] self-start'>
+            <b>Bot:</b> Hello! I'm ready to assist you. How can I help today?
+        </div>
+    </div>
+
+    <div class="input-area flex gap-3 pt-4 border-t border-purple-300/20">
+        <input id="user-input" type="text" placeholder="Type your message..."
+               class="flex-grow p-3 rounded-xl bg-purple-500/10 border border-purple-300/20 text-white placeholder-purple-200/60 focus:outline-none focus:ring-2 focus:ring-purple-400 transition duration-200"
+               onkeypress="if(event.key === 'Enter') sendMessage()"/>
+
+        <button onclick="sendMessage()"
+                class="send-button px-5 py-3 rounded-xl font-semibold text-white shadow-lg focus:outline-none focus:ring-4 focus:ring-purple-500/50">
+            Send
+        </button>
+    </div>
+</div>
+
+<script>
+async function sendMessage() {
+    const input = document.getElementById("user-input");
+    const message = input.value.trim();
+    if (!message) return;
+
+    const chatBox = document.getElementById("chat-box");
+    chatBox.innerHTML += `
+        <div class='user-message p-3 rounded-xl max-w-[85%] ml-auto'>
+            <b>You:</b> ${message}
+        </div>
+    `;
+    input.value = "";
+
+    const loadingId = 'loading-' + Date.now();
+    chatBox.innerHTML += `
+        <div id="${loadingId}" class='bot-message p-3 rounded-xl max-w-[85%] mr-auto'>
+            <b>Bot:</b> <span class="dot-flashing"></span>
+        </div>
+    `;
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+    try {
+        const res = await fetch("/ask", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message })
+        });
+        const data = await res.json();
+
+        document.getElementById(loadingId).remove();
+
+        chatBox.innerHTML += `
+            <div class='bot-message p-3 rounded-xl max-w-[85%] mr-auto'>
+                <b>Bot:</b> ${data.reply}
+            </div>
+        `;
+        chatBox.scrollTop = chatBox.scrollHeight;
+    } catch (err) {
+        console.error(err);
+        document.getElementById(loadingId).remove();
+        chatBox.innerHTML += `
+            <div class='bot-message p-3 rounded-xl max-w-[85%] mr-auto'>
+                <b>Bot:</b> Connection error. Try again.
+            </div>
+        `;
+    }
+}
+</script>
+</body>
+</html>
