@@ -1,203 +1,108 @@
 from flask import Flask, render_template, request, jsonify
 import google.generativeai as genai
-import json
-import re
-import os
-import random
-import textwrap
+import json, re, os, random
 
 app = Flask(__name__)
 
-# --- Google Gemini API Configuration ---
-GOOGLE_API_KEY = "AIzaSyAfdSjyViGbtyktFAyRudfkNyW-rLFbpoI"  # Your actual API key
+# --- Configuration ---
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", "AIzaSyAfdSjyViGbtyktFAyRudfkNyW-rLFbpoI")
 genai.configure(api_key=GOOGLE_API_KEY)
 model = genai.GenerativeModel("models/gemini-2.5-flash")
 
-# --- Intents System ---
-def load_intents(file_path="intents.json"):
-    """Load intents from JSON file"""
+# --- Intents Loading ---
+def load_intents(file_path="test\intents.json"):
+    """Load chatbot intents from a JSON file."""
     try:
-        print("Current working directory:", os.getcwd())
-        print("Looking for intents file at:", os.path.abspath(file_path))
-        
         with open(file_path, 'r', encoding='utf-8') as f:
-            intents = json.load(f)
-        
-        print(f"✅ Successfully loaded {len(intents.get('intents', []))} intents from {file_path}")
-        
-        # Print all loaded intents for verification
-        if "intents" in intents:
-            for i, intent in enumerate(intents["intents"]):
-                print(f"  Intent {i+1}: '{intent.get('tag', 'No tag')}'")
-                print(f"    Patterns: {intent.get('patterns', [])}")
-                print(f"    Responses: {intent.get('responses', [])}")
-                print()
-        
-        return intents
-    except FileNotFoundError:
-        print(f"❌ Error: {file_path} not found in {os.getcwd()}")
-        print("Please make sure intents.json exists in the same directory as app.py")
-        return {"intents": []}
-    except json.JSONDecodeError as e:
-        print(f"❌ Error decoding JSON from {file_path}: {e}")
-        return {"intents": []}
+            data = json.load(f)
+        print(f"✅ Loaded {len(data.get('intents', []))} intents.")
+        return data
     except Exception as e:
-        print(f"❌ Error loading intents: {e}")
+        print(f"❌ Failed to load intents: {e}")
         return {"intents": []}
 
-def get_intent_response(user_input, intents):
-    """Get response from intents based on user input"""
-    user_input = user_input.lower()
-    print(f"🔍 Searching intents for: '{user_input}'")
-    
-    for intent in intents["intents"]:
-        for pattern in intent["patterns"]:
-            if pattern.lower() in user_input:
-                response = random.choice(intent["responses"])
-                print(f"✅ Intent matched: '{intent['tag']}' -> '{response}'")
-                return response
-    
-    print("❌ No intent match found")
-    return None
-
-# Load intents at startup
 intents_data = load_intents()
 
+# --- Intent Matching ---
+def get_intent_response(user_input, intents):
+    """Return a predefined response if user input matches an intent pattern."""
+    user_input = user_input.lower()
+    for intent in intents.get("intents", []):
+        for pattern in intent.get("patterns", []):
+            if pattern.lower() in user_input:
+                return random.choice(intent["responses"])
+    return None
+
+# --- Response Formatter ---
 def format_response(text):
-    """Format the response with proper line breaks and structure"""
+    """Apply HTML formatting for chatbot responses."""
     if not text:
-        return text
+        return ""
     
-    # Clean up the text
     text = text.strip()
-    
-    # Replace common markdown-like formatting
     text = re.sub(r'\*\*(.*?)\*\*', r'<strong>\1</strong>', text)
     text = re.sub(r'\*(.*?)\*', r'<em>\1</em>', text)
     text = re.sub(r'`(.*?)`', r'<code>\1</code>', text)
-    
-    # Handle numbered lists
     text = re.sub(r'(\d+)\.\s', r'<br>\1. ', text)
-    
-    # Handle bullet points (both - and •)
     text = re.sub(r'[\-\•]\s', r'<br>• ', text)
-    
-    # Handle line breaks - preserve intentional line breaks
-    text = text.replace('\n\n', '<br><br>')
-    text = text.replace('\n', '<br>')
-    
-    # Format paragraphs (split by double line breaks)
-    paragraphs = text.split('<br><br>')
-    formatted_paragraphs = []
-    
-    for paragraph in paragraphs:
-        if paragraph.strip():
-            # Clean up the paragraph
-            paragraph = paragraph.strip()
-            # Add proper spacing
-            formatted_paragraphs.append(paragraph)
-    
-    # Join with proper spacing
-    formatted_text = '<br><br>'.join(formatted_paragraphs)
-    
-    # Ensure proper line breaks for lists
-    formatted_text = re.sub(r'(<br>)+•', r'<br>•', formatted_text)
-    formatted_text = re.sub(r'(<br>)+(\d+\.)', r'<br>\2', formatted_text)
-    
-    return formatted_text
+    text = text.replace('\n\n', '<br><br>').replace('\n', '<br>')
+    return text
 
+# --- Gemini Query ---
 def query_google_gemini(prompt):
-    """Query Gemini API for responses with proper formatting"""
+    """Send a query to Gemini API and return formatted response."""
     try:
-        print(f"🤖 Sending to Gemini API: '{prompt}'")
-        
-        # Add formatting instructions to the prompt for better structured responses
-        formatted_prompt = f"""Please provide a well-structured response to the following. 
-        Use clear paragraphs, bullet points for lists, and proper formatting where appropriate.
-        
-        Question: {prompt}
-        
-        Please respond in a clear, organized manner:"""
-        
+        formatted_prompt = (
+            f"Answer the following clearly and concisely using bullet points if needed:\n\n{prompt}"
+        )
         response = model.generate_content(formatted_prompt)
-        result = response.text.strip() if response and response.text else "I'm not sure how to respond."
-        
-        # Format the response
-        formatted_result = format_response(result)
-        print(f"✅ Gemini response (formatted): '{formatted_result}'")
-        return formatted_result
+        text = response.text.strip() if response and response.text else "I'm not sure how to respond."
+        return format_response(text)
     except Exception as e:
-        error_msg = f"API error: {str(e)}"
-        print(f"❌ Gemini API error: {error_msg}")
-        return format_response(error_msg)
+        return format_response(f"API error: {e}")
 
+# --- Flask Routes ---
 @app.route('/')
 def index():
     return render_template('index.html')
 
 @app.route('/ask', methods=['POST'])
 def ask():
-    user_message = request.json.get('message', '')
-    print(f"📨 Received message: '{user_message}'")
+    user_message = request.json.get('message', '').strip()
+    if not user_message:
+        return jsonify({'reply': "Please enter a message.", 'source': 'system'})
     
-    # First, try to get response from intents
-    intent_response = get_intent_response(user_message, intents_data)
+    intent_reply = get_intent_response(user_message, intents_data)
+    if intent_reply:
+        return jsonify({'reply': format_response(intent_reply), 'source': 'intent'})
     
-    if intent_response:
-        # Use intent response (format it too)
-        print("🎯 Using intent response")
-        formatted_response = format_response(intent_response)
-        return jsonify({
-            'reply': formatted_response,
-            'source': 'intent'
-        })
-    else:
-        # Fall back to Gemini API
-        print("🚀 Falling back to Gemini API")
-        response = query_google_gemini(user_message)
-        return jsonify({
-            'reply': response,
-            'source': 'gemini'
-        })
+    gemini_reply = query_google_gemini(user_message)
+    return jsonify({'reply': gemini_reply, 'source': 'gemini'})
 
 @app.route('/intents')
 def show_intents():
-    """Debug endpoint to show loaded intents"""
+    """Debug endpoint to show loaded intents."""
     return jsonify({
-        'loaded_intents_count': len(intents_data.get("intents", [])),
+        'count': len(intents_data.get("intents", [])),
         'intents': intents_data.get("intents", [])
     })
 
-# --- Command Line Chat Interface (optional) ---
+# --- CLI Mode ---
 def command_line_chat():
-    """Command line version of the chatbot"""
-    print("Hello! I am your chatbot. Type 'exit' to end the conversation.")
-    
+    """Run chatbot in command-line mode."""
+    print("🤖 Chatbot ready. Type 'exit' to quit.")
     while True:
-        user_input = input("You: ")
-        
+        user_input = input("You: ").strip()
         if user_input.lower() == 'exit':
-            print("Goodbye! See you later.")
+            print("Goodbye 👋")
             break
-        
-        # Try intents first
-        intent_response = get_intent_response(user_input, intents_data)
-        
-        if intent_response:
-            print("Bot (Intent):", intent_response)
-        else:
-            # Fall back to Gemini
-            gemini_response = query_google_gemini(user_input)
-            print("Bot (Gemini):", gemini_response)
+        reply = get_intent_response(user_input, intents_data) or query_google_gemini(user_input)
+        print("Bot:", reply)
 
+# --- Run Mode ---
 if __name__ == '__main__':
-    # Check if we're running in command line mode or web mode
     if len(os.sys.argv) > 1 and os.sys.argv[1] == '--cli':
         command_line_chat()
     else:
-        print("🚀 Starting Flask web server...")
-        print(f"📊 Loaded {len(intents_data.get('intents', []))} intents")
-        print("📋 Available intents:", [intent['tag'] for intent in intents_data.get('intents', [])])
-        print("🌐 Server running at: http://127.0.0.1:5000")
-        print("🔍 Debug intents at: http://127.0.0.1:5000/intents")
+        print(f"🚀 Server running at: http://127.0.0.1:5000")
         app.run(debug=True)
