@@ -5,6 +5,7 @@ Sanjan Raj Pant: 25BCE2915
 Anuj Lamsal: 25BCE2941
 Suryansh Sehrawat: 25BBS0163
 
+*****THE ACTUAL PROJECT IS IN THE 'Project' DIRECTORY*****
 
 Install the following libraries to run the program:
 #PyQt5
