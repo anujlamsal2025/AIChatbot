@@ -2,8 +2,13 @@
   "intents": [
     {
       "tag": "greeting",
-      "patterns": ["Hi", "Is anyone there?", "Hello", "Good day", "Whats up", "Hey", "greetings"],
+      "patterns": ["hi", "is anyone there?", "hello", "Good day", "Whats up", "Hey", "greetings"],
       "responses": ["Hello!", "Good to see you again!", "Hi there, how can I help?"]
+    },
+    {
+      "tag":"name",
+      "patterns":["what is your name"],
+      "responses":["Hi, I'm Danfe AI. How can I help?"]
     },
     {
       "tag": "goodbye",
@@ -12,17 +17,17 @@
     },
     {
       "tag": "programming",
-      "patterns": ["What is programming?", "What is coding?", "Tell me about programming", "Tell me about coding", "What is software development?"],
+      "patterns": ["what is programming?", "what is coding?", "tell me about programming", "tell me about coding", "What is software development?"],
       "responses": ["Programming, coding or software development means writing computer code to automate tasks."]
     },
     {
       "tag": "resource",
-      "patterns": ["Where can I learn to code?", "Best way to learn to code", "How can I learn programming?", "Good programming resources", "Can you recommend good coding resources?"],
+      "patterns": ["where can I learn to code?", "best way to learn to code", "how can I learn programming?", "good programming resources", "Can you recommend good coding resources?"],
       "responses": ["There are plenty of documentations, videos about python. You can learn from great teachers from VIT university like Sivakumar sir and Vignesh Sir"]
     },
     {
       "tag": "AI_chatbot",
-      "patterns": ["What is an AI chatbot?", "How does an AI chatbot work?", "Tell me about AI chatbots", "What are AI chatbots used for?", "What is a chatbot?"],
+      "patterns": ["what is an AI chatbot?", "how does an AI chatbot work?", "tell me about AI chatbots", "what are AI chatbots used for?", "what is a chatbot?"],
       "responses": ["An AI chatbot is a software program that uses artificial intelligence to simulate human conversation, allowing users to interact with systems through text or voice."]
     },
     {
